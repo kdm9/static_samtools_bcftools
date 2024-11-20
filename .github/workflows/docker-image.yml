@@ -5,16 +5,20 @@ on:
     branches: [ "main" ]
 jobs:
   build:
+    strategy:
+      matrix:
+        version: 
+          - "1.21"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Build binaries within docker
-      run: docker build . --tag ssb --build-arg SAMTOOLS_VERSION=${{ github.ref_name }}
+      run: docker build . --tag ssb --build-arg SAMTOOLS_VERSION=${{ matrix.version }}
     - name: Extract binaries
-      run: docker run -i --rm --volume $(pwd):/t  ssb bash -c 'cd /target && tar cvf /t/static_samtools_bcftools_v${{ github.ref_name }}.tar.xz .'
+      run: docker run -i --rm --volume $(pwd):/t  ssb bash -c 'cd /target && tar cvf /t/static_samtools_bcftools_v${{ matrix.version }}.tar.xz .'
     - name: GitHub Releases
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
         name: ${{ github.event.repository.updated_at}}
-        files: static_samtools_bcftools_v${{ github.ref_name }}.tar.xz
+        files: static_samtools_bcftools_v${{ matrix.version }}.tar.xz
