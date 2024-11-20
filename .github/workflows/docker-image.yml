@@ -18,11 +18,11 @@ jobs:
     - name: Build binaries within docker
       run: docker build . --tag ssb --build-arg SAMTOOLS_VERSION=${{ matrix.version }}
     - name: Extract binaries
-      run: docker run -i --rm --volume $(pwd):/t  ssb bash -c 'cd /target && tar cvf /t/static_samtools_bcftools_v${{ matrix.version }}.tar.xz .'
+      run: docker run -i --rm --volume $(pwd):/t  ssb cp -r /target /t/static_samtools_bcftools_v${{ matrix.version }}
     - uses: actions/upload-artifact@v4
       with:
         name: static_samtools_bcftools_v${{ matrix.version }}
-        path: static_samtools_bcftools_v${{ matrix.version }}.tar.xz
+        path: static_samtools_bcftools_v${{ matrix.version }}
         if-no-files-found: warn
         retention-days: 90
         overwrite: true
