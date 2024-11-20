@@ -14,7 +14,7 @@ jobs:
     - name: Build binaries within docker
       run: docker build . --tag ssb
     - name: Extract binaries
-      run: docker run -i --rm ssb -V $PWD/:/t 'cd /target && tar cvf /t/static_samtools_bcftools_v1.21.tar.xz .'
+      run: docker run -i --rm ssb --volume $(pwd):/t 'cd /target && tar cvf /t/static_samtools_bcftools_v1.21.tar.xz .'
     - name: GitHub Releases
       uses: fnkr/github-action-ghr@v1.3
       env:
