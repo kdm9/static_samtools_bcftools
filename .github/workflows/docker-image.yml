@@ -12,12 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y%m%d')"
     - name: Build binaries within docker
       run: docker build . --tag ssb --build-arg SAMTOOLS_VERSION=${{ matrix.version }}
     - name: Extract binaries
       run: docker run -i --rm --volume $(pwd):/t  ssb bash -c 'cd /target && tar cvf /t/static_samtools_bcftools_v${{ matrix.version }}.tar.xz .'
+    - name: Push Git Tag
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@users.noreply.github.com"
+        git tag ${{ steps.date.outputs.date }}
+        git push origin ${{ steps.date.outputs.date }}
     - name: GitHub Releases
       uses: softprops/action-gh-release@v2
       with:
-        name: ${{ github.event.repository.updated_at}}
+        name: ${{ steps.date.outputs.date }}
         files: static_samtools_bcftools_v${{ matrix.version }}.tar.xz
