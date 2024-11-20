@@ -3,20 +3,18 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Build binaries within docker
-      run: docker build . --tag ssb
+      run: docker build . --tag ssb --build-arg SAMTOOLS_VERSION=${{ github.ref_name }}
     - name: Extract binaries
-      run: docker run -i --rm --volume $(pwd):/t  ssb bash -c 'cd /target && tar cvf /t/static_samtools_bcftools_v1.21.tar.xz .'
+      run: docker run -i --rm --volume $(pwd):/t  ssb bash -c 'cd /target && tar cvf /t/static_samtools_bcftools_v${{ github.ref_name }}.tar.xz .'
     - name: GitHub Releases
-      uses: fnkr/github-action-ghr@v1.3
-      env:
-        GHR_PATH: static_samtools_bcftools_v1.21.tar.xz
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: ${{ github.event.repository.updated_at}}
+        files: static_samtools_bcftools_v${{ github.ref_name }}.tar.xz

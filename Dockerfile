@@ -5,7 +5,6 @@ RUN apt-get update && \
     apt-get -y install cmake zlib1g-dev libbz2-dev liblzma-dev libgsl-dev build-essential
 
 ARG SAMTOOLS_VERSION=1.21
-ARG BCFTOOLS_VERSION=1.21
 ARG LIBDEFLATE_VERSION=1.22
 
 RUN mkdir -p /wd /target/bin
@@ -35,11 +34,11 @@ RUN ls /wd && cd /wd && \
     ldd samtools && cp samtools /target/bin
 
     
-ADD https://github.com/samtools/bcftools/releases/download/${BCFTOOLS_VERSION}/bcftools-${BCFTOOLS_VERSION}.tar.bz2 /wd/
+ADD https://github.com/samtools/bcftools/releases/download/${SAMTOOLS_VERSION}/bcftools-${SAMTOOLS_VERSION}.tar.bz2 /wd/
 ADD ./static_bcftools.mk bcftools.sh /wd/
 RUN cd /wd && \
-    tar xvf bcftools-${BCFTOOLS_VERSION}.tar.bz2 && \
-    cd bcftools-${BCFTOOLS_VERSION} && \
+    tar xvf bcftools-${SAMTOOLS_VERSION}.tar.bz2 && \
+    cd bcftools-${SAMTOOLS_VERSION} && \
     mv ../static_bcftools.mk ../bcftools.sh ./ && \
     make -f static_bcftools.mk -j8 static_bcftools && \
     ldd bcftools && \
