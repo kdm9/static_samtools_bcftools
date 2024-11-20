@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build binaries within docker
+      run: docker build . --tag ssb
+    - name: Extract binaries
+      run: docker run -i --rm ssb -V $PWD/:/t 'cd /target && tar cvf /t/static_samtools_bcftools_v1.21.tar.xz .'
+    - name: GitHub Releases
+      uses: fnkr/github-action-ghr@v1.3
+      env:
+        GHR_PATH: static_samtools_bcftools_v1.21.tar.xz
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
