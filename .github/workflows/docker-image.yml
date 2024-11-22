@@ -18,7 +18,14 @@ jobs:
     - name: Build binaries within docker
       run: docker build . --tag ssb --build-arg SAMTOOLS_VERSION=${{ matrix.version }}
     - name: Extract binaries
-      run: docker run -i --rm --volume $(pwd):/t  ssb cp -r /target /t/static_samtools_bcftools_v${{ matrix.version }}
+      run: |
+        docker run -i --rm --volume $(pwd):/t  ssb cp -r /target /t/static_samtools_bcftools_v${{ matrix.version }}
+        tar xvJf static_samtools_bcftools_v${{ matrix.version }}.tar.xz  static_samtools_bcftools_v${{ matrix.version }}
+    - name: Publish to release
+      run: |
+        gh release create  ${{ steps.date.outputs.date }} static_samtools_bcftools_v${{ matrix.version }}.tar.xz
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/upload-artifact@v4
       with:
         name: static_samtools_bcftools_v${{ matrix.version }}
@@ -26,12 +33,6 @@ jobs:
         if-no-files-found: warn
         retention-days: 90
         overwrite: true
-#    - name: Push Git Tag
-#      run: |
-#        git config user.name "GitHub Actions"
-#        git config user.email "github-actions@users.noreply.github.com"
-#        git tag ${{ steps.date.outputs.date }}
-#        git push origin ${{ steps.date.outputs.date }}
 #    - name: Create Release
 #      id: create_release
 #      uses: actions/create-release@latest
