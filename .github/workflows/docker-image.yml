@@ -20,7 +20,7 @@ jobs:
     - name: Extract binaries
       run: |
         docker run -i --rm --volume $(pwd):/t  ssb cp -r /target /t/static_samtools_bcftools_v${{ matrix.version }}
-        tar xvJf static_samtools_bcftools_v${{ matrix.version }}.tar.xz  static_samtools_bcftools_v${{ matrix.version }}
+        tar cvJf static_samtools_bcftools_v${{ matrix.version }}.tar.xz  static_samtools_bcftools_v${{ matrix.version }}
     - name: Publish to release
       run: |
         gh release create  ${{ steps.date.outputs.date }} static_samtools_bcftools_v${{ matrix.version }}.tar.xz
